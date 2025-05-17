@@ -19,7 +19,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -58,6 +57,8 @@ fun MainScreen() {
     // change that to current screen's title
     val title = remember { mutableStateOf(currentScreen.title) }
 
+    val isDialogOpen = remember { mutableStateOf(false) }
+
     ModalNavigationDrawer(
         gesturesEnabled = !drawerState.isClosed,
         drawerState = drawerState,
@@ -71,17 +72,20 @@ fun MainScreen() {
                     modifier = Modifier.padding(16.dp),
                 ) {
                     items(screensInDrawer) { item ->
-                        NavigationDrawerItem(
-                            label = { Text(text = item.drawerTitle) },
+                        DrawerItem(
                             selected = currentRoute == item.drawerRoute,
-                            onClick = { scope.launch { drawerState.close() } },
+                            item = item,
+                            onDrawerItemClicked = {
+                                scope.launch { drawerState.close() }
+                                if (item.drawerRoute == Screen.DrawerScreen.AddAccount.drawerRoute) {
+                                    // Open dialog
+                                    isDialogOpen.value = true
+                                } else {
+                                    controller.navigate(route = item.drawerRoute)
+                                    title.value = item.drawerTitle
+                                }
+                            },
                         )
-                        if (item.drawerRoute == Screen.DrawerScreen.AddAccount.drawerRoute) {
-                            // Open dialog
-                        } else {
-                            controller.navigate(route = item.drawerRoute)
-                            title.value = item.drawerTitle
-                        }
                     }
                 }
             }
@@ -89,7 +93,9 @@ fun MainScreen() {
     ) {
         Scaffold(
             topBar = {
-                TopAppBar(title = { Text(text = "Home") }, navigationIcon = {
+                TopAppBar(
+                    title = { Text(text = "Home") },
+                    navigationIcon = {
                     IconButton(
                         onClick = {
                             // Open the drawer
@@ -101,7 +107,8 @@ fun MainScreen() {
                             contentDescription = "Menu"
                         )
                     }
-                })
+                    },
+                )
             },
         ) { paddingValues ->
             Navigation(
@@ -109,6 +116,7 @@ fun MainScreen() {
                 navController = controller,
                 paddingValues = paddingValues,
             )
+            AccountDialog(isDialogOpen = isDialogOpen)
         }
     }
 }
