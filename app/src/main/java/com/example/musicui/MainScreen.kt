@@ -94,7 +94,7 @@ fun MainScreen() {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text(text = "Home") },
+                    title = { Text(text = title.value) },
                     navigationIcon = {
                     IconButton(
                         onClick = {
@@ -159,7 +159,7 @@ fun Navigation(
         modifier = Modifier.padding(paddingValues)
     ) {
         composable(Screen.DrawerScreen.Account.route) {
-
+            AccountScreen()
         }
         composable(Screen.DrawerScreen.Subscription.route) {
 
