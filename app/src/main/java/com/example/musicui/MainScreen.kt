@@ -2,6 +2,7 @@ package com.example.musicui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,6 +33,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.launch
@@ -39,6 +44,8 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen() {
+    val viewModel: MainViewModel = viewModel()
+
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
@@ -47,8 +54,9 @@ fun MainScreen() {
     val navBackStackEntry by controller.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
+    val currentScreen = remember { viewModel.currentScreen.value }
     // change that to current screen's title
-    val title = remember { mutableStateOf("") }
+    val title = remember { mutableStateOf(currentScreen.title) }
 
     ModalNavigationDrawer(
         gesturesEnabled = !drawerState.isClosed,
@@ -96,8 +104,10 @@ fun MainScreen() {
                 })
             },
         ) { paddingValues ->
-            Text(
-                text = "Text", modifier = Modifier.padding(paddingValues)
+            Navigation(
+                viewModel = viewModel,
+                navController = controller,
+                paddingValues = paddingValues,
             )
         }
     }
@@ -126,5 +136,28 @@ fun DrawerItem(
             text = item.drawerTitle,
             style = MaterialTheme.typography.bodyMedium,
         )
+    }
+}
+
+@Composable
+fun Navigation(
+    viewModel: MainViewModel,
+    navController: NavHostController,
+    paddingValues: PaddingValues,
+) {
+    NavHost(
+        navController = navController,
+        startDestination = Screen.DrawerScreen.AddAccount.route,
+        modifier = Modifier.padding(paddingValues)
+    ) {
+        composable(Screen.DrawerScreen.Account.route) {
+
+        }
+        composable(Screen.DrawerScreen.Subscription.route) {
+
+        }
+        composable(Screen.DrawerScreen.AddAccount.route) {
+
+        }
     }
 }
