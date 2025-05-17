@@ -162,7 +162,7 @@ fun Navigation(
             AccountScreen()
         }
         composable(Screen.DrawerScreen.Subscription.route) {
-
+            SubscriptionScreen()
         }
         composable(Screen.DrawerScreen.AddAccount.route) {
 
