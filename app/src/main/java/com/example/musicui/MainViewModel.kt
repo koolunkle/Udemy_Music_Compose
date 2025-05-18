@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 
 class MainViewModel : ViewModel() {
 
-    private val _currentScreen: MutableState<Screen> = mutableStateOf(Screen.DrawerScreen.AddAccount)
+    private val _currentScreen: MutableState<Screen> = mutableStateOf(Screen.DrawerScreen.Account)
     val currentScreen: State<Screen> = _currentScreen
 
     fun setCurrentScreen(screen: Screen) {

@@ -83,7 +83,10 @@ fun MainScreen() {
                 screensInBottom.forEach { item ->
                     NavigationBarItem(
                         selected = currentRoute == item.bottomRoute,
-                        onClick = { navController.navigate(route = item.bottomRoute) },
+                        onClick = {
+                            navController.navigate(route = item.bottomRoute)
+                            title.value = item.bottomTitle
+                        },
                         icon = {
                             Icon(
                                 painter = painterResource(id = item.icon),
@@ -278,7 +281,7 @@ fun Navigation(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.DrawerScreen.AddAccount.route,
+        startDestination = Screen.DrawerScreen.Account.route,
         modifier = Modifier.padding(paddingValues)
     ) {
         // Bottom Screens
@@ -297,9 +300,6 @@ fun Navigation(
         }
         composable(Screen.DrawerScreen.Subscription.route) {
             SubscriptionScreen()
-        }
-        composable(Screen.DrawerScreen.AddAccount.route) {
-
         }
     }
 }
