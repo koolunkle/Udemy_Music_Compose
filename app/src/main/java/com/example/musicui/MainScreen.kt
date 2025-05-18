@@ -197,7 +197,7 @@ fun Navigation(
 
         }
         composable(Screen.BottomScreen.Browse.route) {
-
+            BrowseScreen()
         }
         // Drawer Screens
         composable(Screen.DrawerScreen.Account.route) {
