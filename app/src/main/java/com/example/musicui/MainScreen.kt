@@ -79,8 +79,8 @@ fun MainScreen() {
                         },
                         label = { Text(text = item.bottomTitle) },
                         colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = Color.White,
-                            selectedTextColor = Color.White,
+                            selectedIconColor = Color.Green,
+                            selectedTextColor = Color.Green,
                             unselectedIconColor = Color.Black,
                             unselectedTextColor = Color.Black,
                         ),
@@ -189,6 +189,17 @@ fun Navigation(
         startDestination = Screen.DrawerScreen.AddAccount.route,
         modifier = Modifier.padding(paddingValues)
     ) {
+        // Bottom Screens
+        composable(Screen.BottomScreen.Home.route) {
+
+        }
+        composable(Screen.BottomScreen.Library.route) {
+
+        }
+        composable(Screen.BottomScreen.Browse.route) {
+
+        }
+        // Drawer Screens
         composable(Screen.DrawerScreen.Account.route) {
             AccountScreen()
         }
