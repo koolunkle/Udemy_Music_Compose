@@ -2,15 +2,21 @@ package com.example.musicui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.DrawerValue
@@ -18,6 +24,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationBar
@@ -27,6 +34,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -51,11 +60,12 @@ fun MainScreen() {
     val viewModel: MainViewModel = viewModel()
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
 
     // Allow use to find out on which "Screen" we current are
-    val controller = rememberNavController()
-    val navBackStackEntry by controller.currentBackStackEntryAsState()
+    val navController = rememberNavController()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
     val currentScreen = remember { viewModel.currentScreen.value }
@@ -63,6 +73,7 @@ fun MainScreen() {
     val title = remember { mutableStateOf(currentScreen.title) }
 
     val isDialogOpen = remember { mutableStateOf(false) }
+    val isSheetFullScreen = remember { mutableStateOf(false) }
 
     val bottomBar: @Composable () -> Unit = {
         if (currentScreen is Screen.DrawerScreen || currentScreen == Screen.BottomScreen.Home) {
@@ -70,7 +81,7 @@ fun MainScreen() {
                 screensInBottom.forEach { item ->
                     NavigationBarItem(
                         selected = currentRoute == item.bottomRoute,
-                        onClick = { controller.navigate(route = item.bottomRoute) },
+                        onClick = { navController.navigate(route = item.bottomRoute) },
                         icon = {
                             Icon(
                                 painter = painterResource(id = item.icon),
@@ -90,6 +101,15 @@ fun MainScreen() {
         }
     }
 
+    ModalBottomSheet(
+        onDismissRequest = {},
+        sheetState = sheetState,
+        shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+        containerColor = Color.White,
+        dragHandle = null,
+    ) {
+        ModalBottomSheetContent(modifier = if (isSheetFullScreen.value) Modifier.fillMaxSize() else Modifier.fillMaxWidth())
+    }
     ModalNavigationDrawer(
         gesturesEnabled = !drawerState.isClosed,
         drawerState = drawerState,
@@ -110,7 +130,7 @@ fun MainScreen() {
                                     // Open dialog
                                     isDialogOpen.value = true
                                 } else {
-                                    controller.navigate(route = item.drawerRoute)
+                                    navController.navigate(route = item.drawerRoute)
                                     title.value = item.drawerTitle
                                 }
                             },
@@ -137,13 +157,16 @@ fun MainScreen() {
                         )
                     }
                     },
+                    actions = {
+
+                    },
                 )
             },
             bottomBar = bottomBar,
         ) { paddingValues ->
             Navigation(
                 viewModel = viewModel,
-                navController = controller,
+                navController = navController,
                 paddingValues = paddingValues,
             )
             AccountDialog(isDialogOpen = isDialogOpen)
@@ -175,6 +198,34 @@ fun DrawerItem(
             text = item.drawerTitle,
             style = MaterialTheme.typography.bodyMedium,
         )
+    }
+}
+
+@Composable
+fun ModalBottomSheetContent(modifier: Modifier) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(300.dp)
+            .background(color = MaterialTheme.colorScheme.primaryContainer),
+    ) {
+        Column(
+            modifier = modifier.padding(16.dp),
+            verticalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Row(modifier = modifier.padding(16.dp)) {
+                Icon(
+                    painter = painterResource(id = R.drawable.settings_24),
+                    contentDescription = "Setting",
+                    modifier = Modifier.padding(end = 8.dp),
+                )
+                Text(
+                    text = "Settings",
+                    fontSize = 20.sp,
+                    color = Color.White,
+                )
+            }
+        }
     }
 }
 
