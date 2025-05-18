@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -19,6 +20,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -28,6 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -59,6 +64,32 @@ fun MainScreen() {
 
     val isDialogOpen = remember { mutableStateOf(false) }
 
+    val bottomBar: @Composable () -> Unit = {
+        if (currentScreen is Screen.DrawerScreen || currentScreen == Screen.BottomScreen.Home) {
+            NavigationBar(modifier = Modifier.wrapContentSize()) {
+                screensInBottom.forEach { item ->
+                    NavigationBarItem(
+                        selected = currentRoute == item.bottomRoute,
+                        onClick = { controller.navigate(route = item.bottomRoute) },
+                        icon = {
+                            Icon(
+                                painter = painterResource(id = item.icon),
+                                contentDescription = item.bottomTitle,
+                            )
+                        },
+                        label = { Text(text = item.bottomTitle) },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = Color.White,
+                            selectedTextColor = Color.White,
+                            unselectedIconColor = Color.Black,
+                            unselectedTextColor = Color.Black,
+                        ),
+                    )
+                }
+            }
+        }
+    }
+
     ModalNavigationDrawer(
         gesturesEnabled = !drawerState.isClosed,
         drawerState = drawerState,
@@ -68,9 +99,7 @@ fun MainScreen() {
                     .widthIn(max = 300.dp)
                     .fillMaxHeight(),
             ) {
-                LazyColumn(
-                    modifier = Modifier.padding(16.dp),
-                ) {
+                LazyColumn(modifier = Modifier.padding(16.dp)) {
                     items(screensInDrawer) { item ->
                         DrawerItem(
                             selected = currentRoute == item.drawerRoute,
@@ -110,6 +139,7 @@ fun MainScreen() {
                     },
                 )
             },
+            bottomBar = bottomBar,
         ) { paddingValues ->
             Navigation(
                 viewModel = viewModel,
@@ -127,13 +157,14 @@ fun DrawerItem(
     item: Screen.DrawerScreen,
     onDrawerItemClicked: () -> Unit,
 ) {
-    val color = if (selected) Color.DarkGray else Color.White
+    val color = if (selected) Color.Green else Color.White
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 16.dp)
             .background(color = color)
-            .clickable { onDrawerItemClicked() }
+            .clickable { onDrawerItemClicked() },
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
             painter = painterResource(id = item.icon),
